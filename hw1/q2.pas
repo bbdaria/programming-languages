@@ -80,6 +80,6 @@ begin
   for Ch := 'a' to 'z' do
   begin
     if Frequency[Ch] > 0 then
-      WriteLn(Ch, ': ', Frequency[Ch]);
+      WriteLn(Ch, ' ', Frequency[Ch]);
   end;
 end.
