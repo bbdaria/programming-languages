@@ -23,7 +23,9 @@ var
     data1: Integer;
     data2: string;
     data3: string;
-    action: string;   
+    action: string;
+    constent: Integer;
+    another_constent :string;
 
 procedure add(var tp:CourseType; var id:Integer; var name:string;var data1:Integer; var data2:string; var data3:string);
 begin
@@ -61,26 +63,28 @@ begin
                         begin
                             ReadLn(data1);
                             typee := REG;
-                            add(typee,id,name,data1,'buffer','buffer');
+                            another_constent := 'buffer';
+                            add(typee,id,name,data1,another_constent,another_constent);
                         end;
                     if coursetypee = 'LAB' then
                         begin
                             ReadLn(data2);
                             ReadLn(data3);
                             typee := LAB;
-                            add(typee,id,name,1,data2,data3);
+                            constent := 1;
+                            add(typee,id,name,constent,data2,data3);
                         end;
                     if coursetypee = 'SEM' then
                         begin
                             ReadLn(data2);
                             ReadLn(data3);
                             typee := SEM;
-                            add(typee,id,name,1,data2,data3);
+                            constent := 1;
+                            add(typee,id,name,constent,data2,data3);
                         end;
             end;
-        if action = 'PRINT' then
-            // dariaa your code here
-            ;
+        if action = 'PRINT' then Write('dariaa your code here');
+            
         if action = 'END' then flag:=false;
 
     end;
