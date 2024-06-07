@@ -11,7 +11,7 @@ type
             LAB : (nameOfLecturer: string; place: string);
             SEM : (startTime: string; endTime: string)
     end;
-Course_arr = array[0..99] of Course;
+Course_arr = array[0..100] of Course;
 var
     courses : Course_arr;
     flag : boolean;
@@ -54,7 +54,7 @@ procedure printCourseByID(courseID: Integer);
 var
     i: Integer;
 begin
-    for i := 0 to 99 do
+    for i := 0 to 100 do
     begin
         if (courses[i].Id = courseID) then
         begin
