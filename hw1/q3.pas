@@ -2,15 +2,14 @@ program ThirdQuestion;
 type
     CourseType = (REG, LAB, SEM);
 
-
     Course = record
-    typeOfCourse: CourseType;
-    Id : Integer;
-    name : string;
-    case data : CourseType of
-        REG : (numberOfLectures: Integer);
-        LAB : (nameOfLecturer: string; place: string);
-        SEM : (startTime: string; endTime: string)
+        typeOfCourse: CourseType;
+        Id : Integer;
+        name : string;
+        case data : CourseType of
+            REG : (numberOfLectures: Integer);
+            LAB : (nameOfLecturer: string; place: string);
+            SEM : (startTime: string; endTime: string)
     end;
 Course_arr = array[0..99] of Course;
 var
@@ -47,6 +46,7 @@ begin
             courses[id-1000].startTime := data2;
             courses[id-1000].endTime := data3;
         end;
+    end; // <-- Adding semicolon here
 end;
 
 
@@ -65,30 +65,27 @@ begin
                     WriteLn(courses[i].Id);
                     WriteLn(courses[i].name);
                     WriteLn(courses[i].numberOfLectures);
-                
                 end;
                 LAB: 
                 begin
                     WriteLn('LAB');
                     WriteLn(courses[i].Id);
                     WriteLn(courses[i].name);
-                    WriteLn(courses[i].nameOfLecturer)
-                    WriteLn(courses[i].place)
+                    WriteLn(courses[i].nameOfLecturer);
+                    WriteLn(courses[i].place);
                 end;
                 SEM: 
                 begin
                     WriteLn('SEM');
                     WriteLn(courses[i].Id);
                     WriteLn(courses[i].name);
-                    WriteLn(courses[i].startTime)
-                    WriteLn(courses[i].endTime)
+                    WriteLn(courses[i].startTime);
+                    WriteLn(courses[i].endTime);
                 end;
             end;
         end;
     end;
 end;
-
-
 
 begin
     flag := true;
