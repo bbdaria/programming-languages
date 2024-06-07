@@ -46,7 +46,7 @@ begin
             courses[id-1000].startTime := data2;
             courses[id-1000].endTime := data3;
         end;
-    end; // <-- Adding semicolon here
+    end; 
 end;
 
 
