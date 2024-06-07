@@ -49,6 +49,47 @@ begin
         end;
 end;
 
+
+procedure printCourseByID(courseID: Integer);
+var
+    i: Integer;
+begin
+    for i := 0 to 99 do
+    begin
+        if (courses[i].Id = courseID) then
+        begin
+            case courses[i].typeOfCourse of
+                REG: 
+                begin
+                    WriteLn('REG');
+                    WriteLn(courses[i].Id);
+                    WriteLn(courses[i].name);
+                    WriteLn(courses[i].numberOfLectures);
+                
+                end;
+                LAB: 
+                begin
+                    WriteLn('LAB');
+                    WriteLn(courses[i].Id);
+                    WriteLn(courses[i].name);
+                    WriteLn(courses[i].nameOfLecturer)
+                    WriteLn(courses[i].place)
+                end;
+                SEM: 
+                begin
+                    WriteLn('SEM');
+                    WriteLn(courses[i].Id);
+                    WriteLn(courses[i].name);
+                    WriteLn(courses[i].startTime)
+                    WriteLn(courses[i].endTime)
+                end;
+            end;
+        end;
+    end;
+end;
+
+
+
 begin
     flag := true;
     while flag do
@@ -83,7 +124,11 @@ begin
                             add(typee,id,name,constent,data2,data3);
                         end;
             end;
-        if action = 'PRINT' then Write('dariaa your code here');
+        if action = 'PRINT' then 
+            begin 
+            ReadLn(id);
+            printCourseByID(id);
+            end;
             
         if action = 'END' then flag:=false;
 
