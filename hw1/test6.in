@@ -1,0 +1,24 @@
+ADD
+REG
+1001
+Introduction to Programming
+3
+ADD
+LAB
+1008
+Somthing complicated
+Prof. H
+Lidov
+ADD
+SEM
+1100
+Advanced Topics in advanced material
+09:00
+11:00
+PRINT
+1001
+PRINT
+1008
+PRINT
+1100
+END
