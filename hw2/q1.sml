@@ -1,0 +1,10 @@
+fun sig1 f g x =  g (f x);
+fun sig2 x f = f(f x);
+fun sig3 f a b = f(a,b);
+fun sig4 a b = a-b<0.01;
+fun sig5 f lst = map (fn innerList => map f innerList) lst;
+fun sig6 a b c = if a= true then c else b;
+fun sig7 () = 5;
+fun sig8 f g a d = g(f a);
+fun sig9 lst = length(lst);
+fun sig10 f [] = [] | sig10 f (x::xs) = (f x) :: (sig10 f xs);
