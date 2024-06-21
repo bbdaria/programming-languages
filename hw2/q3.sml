@@ -7,7 +7,6 @@ fun isMatch  (s1: regexp) (s2: string) : bool =
         val chars1 = String.explode s2
         val chars2 = String.explode s1
 
-        (* Helper function to match lists of characters using hd and tl *)
         fun matchLists([], []) = true
           | matchLists(_, []) = false
           | matchLists([], c2::cs2) =
