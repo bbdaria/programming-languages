@@ -19,12 +19,12 @@ fun isMatch (s1: regexp) (s2: string) : bool =
         fun matchLists([], []) = true
           | matchLists(_, []) = false
           | matchLists([], c2::cs2) =
-              if not (null cs2) andalso hd cs2 = #"*" then matchLists([], tl cs2) else false
+              if not (null cs2) andalso hd cs2 = #"*" andalso c2 <> #"*" then matchLists([], tl cs2) else false
           | matchLists(c1::cs1, c2::cs2) =
-              if not (null cs2) andalso hd cs2 = #"*" then
+              if not (null cs2) andalso hd cs2 = #"*" andalso c2 <> #"*" then
                   matchLists(cutLeadingSequence(c2) (c1::cs1), tl cs2)
               else if c2 = #"*" then
-                  matchLists(c1::cs1, cs2)
+                  false
               else if c1 = c2 then
                   matchLists(cs1, cs2)
               else
