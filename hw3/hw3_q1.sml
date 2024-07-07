@@ -8,14 +8,6 @@ fun to_binary 0 = []
         aux n []
       end;
 
-fun binaryToDecimal binaryList =
-    let
-        fun helper [] _ acc = acc
-          | helper (x::xs) power acc = helper xs (power * 2) (acc + x * power)
-    in
-        helper binaryList 1 0
-    end;
-
 
 fun encode [] = []
   | encode listToCode = 
@@ -66,6 +58,14 @@ fun decode ([], _) = []
         fun foldReverse ([], _) = []
           | foldReverse (first :: rest, 0) = first :: rest
           | foldReverse (first :: rest, a) = reverse first :: foldReverse (rest, a - 1)
+
+        fun binaryToDecimal binaryList =
+          let
+            fun helper [] _ acc = acc
+              | helper (x::xs) power acc = helper xs (power * 2) (acc + x * power)
+          in
+            helper binaryList 1 0
+          end;
         
         val original = first :: getList (rest, length - 1)
         val restOfGiven = getRest (first :: rest, length)
