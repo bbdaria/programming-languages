@@ -44,10 +44,13 @@ local
     (* ====================================== *)
 
 in
-    fun eval string_exp env =
-        case sexp of
-            ATOM => if string_exp = NIL then NIL else if is_number string_exp then sexp_to_int string_exp else
     fun eval NIL env = NIL
-    | eval ATOM (SYMBOL string_exp) env = if is_number string_exp then sexp_to_int string_exp else 
-    | eval ATOM (SYMBOL string_exp) env = 
+    | eval ATOM (SYMBOL string_exp) env = if is_number string_exp then sexp_to_int string_exp else find string_exp env
+    | eval SExp_string env = 
+    let
+        val Sexp = tokenize SExp_string
+    in
+        case Sexp of CONS(a * b) => case a of "quote"
+        else 
+        raise LispError
 end;
