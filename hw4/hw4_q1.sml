@@ -30,10 +30,6 @@ fun defineNested (s: string) ([]: (string -> 'a) list) (z: 'a) = raise Empty   |
         pushEnv newTop rest
     end;
 
-fun find (msg:string) ([]: (string -> 'a) list) = raise Undefined
-  |find (msg:string) (list: (string -> 'a) list) = 
-  let 
-      val top = topEnv(list)
-  in
-      top msg
-  end;
+fun find (msg: string) ([]: (string -> 'a) list) = raise Undefined
+  | find (msg: string) (env::rest) =
+    (env msg) handle Undefined => find msg rest;
