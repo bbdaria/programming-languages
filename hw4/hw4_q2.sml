@@ -44,13 +44,24 @@ local
     (* ====================================== *)
 
 in
-    fun eval NIL env = NIL
-    | eval ATOM (SYMBOL string_exp) env = if is_number string_exp then sexp_to_int string_exp else find string_exp env
-    | eval SExp_string env = 
+    fun eval str env =
     let
-        val Sexp = tokenize SExp_string
-    in
-        case Sexp of CONS(a * b) => case a of "quote"
-        else 
-        raise LispError
+        fun real_eval (ATOM (SYMBOL string_exp)) env =
+        if is_number string_exp then ATOM (SYMBOL string_exp)
+        else find string_exp env
+      | real_eval (ATOM NIL) env = ATOM NIL
+      | real_eval (CONS (ATOM (SYMBOL "quote"), CONS (x, ATOM NIL))) env = x
+      | real_eval (CONS (ATOM (SYMBOL "car"), CONS (x, _))) env = 
+        (case real_eval list env of
+             CONS (x, _) => x (*fix return value*)
+           | _ => raise LispError)
+      | real_eval (CONS (ATOM (SYMBOL "cdr"), CONS (_, y))) env = 
+        (case real_eval list env of
+             CONS (_, y) => y (*fix return value*)
+           | _ => raise LispError)
+      | real_eval (CONS (ATOM(SYMBOL "CONS"),x,y)) env= CONS( )
+
+      | real_eval _ _ = raise LispError;
+    in 
+        real_eval (parse tokenize str) env
 end;
