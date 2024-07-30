@@ -205,7 +205,7 @@ local
             let
                 fun init_params ((CONS (ATOM (SYMBOL param), rest_params)), (CONS (value, rest_values)), env, env_stack) =
                     let
-                        val eval_val = first (eval_aux (value, env_stack))
+                        val eval_val = first (eval_expr (value, env_stack))
                         val updated_env = define param env eval_val
                     in
                         init_params (rest_params, rest_values, updated_env, env_stack)
@@ -217,7 +217,7 @@ local
                 val env = init_params (params, values, env_init, env_stack)
                 val updated_env_stack = pushEnv env env_stack
                 val sexp = sexp_to_string exp
-                val evaluated_exp = first (eval_aux (exp, updated_env_stack))
+                val evaluated_exp = first (eval_expr (exp, updated_env_stack))
             in
                 (evaluated_exp, env_stack)
             end
