@@ -191,13 +191,15 @@ local
             in
                 eval_conditions (conditions, env)
             end
-          | eval_expr (CONS (ATOM (SYMBOL op), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) =
-            if op = "+" orelse op = "-" orelse op = "*" orelse op = "/" orelse op = "mod" then
-                (math_lisp (op, arg1, arg2, env), env)
-            else if op = "=" orelse op = "/=" orelse op = "<" orelse op = ">" then
-                (comp_lisp (op, arg1, arg2, env), env)
-            else
-                (ATOM (SYMBOL "lisp-error"), env)
+        | eval_expr (CONS (ATOM (SYMBOL "+"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("+", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "-"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("-", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "*"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("*", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "/"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("/", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "mod"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("mod", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("=", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
+        | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
           | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (body, ATOM NIL))), args), env_stack) =
             let
                 fun bind_params (CONS (ATOM (SYMBOL param), rest_params), CONS (value, rest_values), env, env_stack) =
