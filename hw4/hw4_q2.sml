@@ -200,23 +200,25 @@ local
         | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
         | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
         | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
-          | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (body, ATOM NIL))), args), env_stack) =
+          | eval_aux (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (exp, ATOM NIL))), values), env_stack) =
             let
-                fun bind_params (CONS (ATOM (SYMBOL param), rest_params), CONS (value, rest_values), env, env_stack) =
+                fun init_params ((CONS (ATOM (SYMBOL param), rest_params)), (CONS (value, rest_values)), env, env_stack) =
                     let
-                        val bound_value = first (eval_aux (value, env_stack))
-                        val updated_env = define param env bound_value
+                        val eval_val = first (eval_aux (value, env_stack))
+                        val updated_env = define param env eval_val
                     in
-                        bind_params (rest_params, rest_values, updated_env, env_stack)
+                        init_params (rest_params, rest_values, updated_env, env_stack)
                     end
-                  | bind_params (ATOM NIL, ATOM NIL, env, env_stack) = env
-                  | bind_params _ = raise LispError
+                    | init_params ((ATOM NIL), (ATOM NIL), env, env_stack) = env
+                    | init_params (_, _, _, _) = raise LispError
 
-                val initial_env = initEnv ()
-                val local_env = bind_params (params, args, initial_env, env_stack)
-                val full_env_stack = pushEnv local_env env_stack
+                val env_init = initEnv()
+                val env = init_params (params, values, env_init, env_stack)
+                val updated_env_stack = pushEnv env env_stack
+                val sexp = sexp_to_string exp
+                val evaluated_exp = first (eval_aux (exp, updated_env_stack))
             in
-                (first (eval_aux (body, full_env_stack)), env_stack)
+                (evaluated_exp, env_stack)
             end
           | eval_expr (CONS (ATOM (SYMBOL sym), ATOM NIL), env) = eval_expr (ATOM (SYMBOL sym), env)
           | eval_expr (ATOM (SYMBOL sym), env) =
