@@ -67,56 +67,52 @@ local
         | is_atom (ATOM (SYMBOL s)) = true
         | is_atom _ = false;
 
-    fun eval_math_operation (op, arg1, arg2, env) =
-    let
-        fun get_value arg = 
-            if is_number arg then
-                string_to_int arg
-            else
-                sexp_to_int (find arg env)
-
-        val num1 = get_value arg1
-        val num2 = get_value arg2
-
-        val result = 
-            case op of
-                "+" => num1 + num2
-              | "-" => num1 - num2
-              | "*" => num1 * num2
-              | "/" => num1 div num2
-              | "mod" => num1 mod num2
-              | _ => raise LispError
-
-        val result_str = Int.toString result
-    in
-        ATOM (SYMBOL result_str)
-    end;
-
-    fun eval_comparison_operation (op, arg1, arg2, env) =
+    fun math_lisp (operation, arg1, arg2, env) =
         let
-            fun get_value arg = 
-                if is_number arg then
-                    string_to_int arg
-                else
-                    sexp_to_int (find arg env)
-
-            val num1 = get_value arg1
-            val num2 = get_value arg2
-
-            val is_true = 
-                case op of
-                    "=" => num1 = num2
-                | "/=" => num1 <> num2
-                | "<" => num1 < num2
-                | ">" => num1 > num2
-                | _ => raise LispError
+            val num1 =  if is_number arg1 then
+                            string_to_int arg1
+                        else
+                            sexp_to_int (find arg1 env)
+            val num2 = if is_number arg2 then
+                            string_to_int arg2
+                        else
+                            sexp_to_int (find arg2 env)
+            val res = 
+                case operation of
+                    "+" => num1 + num2
+                    | "-" => num1 - num2
+                    | "*" => num1 * num2
+                    | "/" => num1 div num2
+                    | "mod" => num1 mod num2
+                    | _ => raise LispError
+            val res_str = Int.toString res
         in
-            if is_true then
-                ATOM (SYMBOL "t")
-            else
-                ATOM (SYMBOL "nil")
+            (ATOM (SYMBOL res_str))
         end;
 
+    fun comp_lisp (comp_op, arg1, arg2, env) =
+        let
+            val num1 =  if is_number arg1 then
+                            string_to_int arg1
+                        else
+                            sexp_to_int (find arg1 env)
+            val num2 = if is_number arg2 then
+                            string_to_int arg2
+                        else
+                            sexp_to_int (find arg2 env)
+            val res = 
+                case comp_op of
+                    "=" => num1 = num2
+                    | "/=" => num1 <> num2
+                    | "<" => num1 < num2
+                    | ">" => num1 > num2
+                    | _ => raise LispError
+        in
+            if res then
+                (ATOM (SYMBOL "t"))
+            else
+                (ATOM (SYMBOL "nil"))
+        end;
 
         
     fun eval_aux (expr, env) = 
@@ -197,9 +193,9 @@ local
             end
           | eval_expr (CONS (ATOM (SYMBOL op), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) =
             if op = "+" orelse op = "-" orelse op = "*" orelse op = "/" orelse op = "mod" then
-                (eval_math_operation (op, arg1, arg2, env), env)
+                (math_lisp (op, arg1, arg2, env), env)
             else if op = "=" orelse op = "/=" orelse op = "<" orelse op = ">" then
-                (eval_comparison_operation (op, arg1, arg2, env), env)
+                (comp_lisp (op, arg1, arg2, env), env)
             else
                 (ATOM (SYMBOL "lisp-error"), env)
           | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (body, ATOM NIL))), args), env_stack) =
@@ -240,4 +236,3 @@ in
             eval_aux (sexp, env) handle LispError => (ATOM (SYMBOL "lisp-error"), env)
         end
 end;
-
