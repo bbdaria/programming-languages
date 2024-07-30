@@ -1,5 +1,5 @@
 use "hw4_q1.sml";
-use "./hw4_parser.sml";
+use "hw4_parser.sml";
 
 exception LispError;
 Control.Print.printLength := 100;
@@ -115,125 +115,128 @@ local
         end;
 
         
-    fun eval_aux (expr, env) = 
-    let
-        fun eval_expr (CONS (ATOM (SYMBOL "cons"), CONS (expr1, CONS (expr2, ATOM NIL))), env) = 
-            let
-                val (val1, new_env1) = eval_aux (expr1, env)
-                val (val2, new_env2) = eval_aux (expr2, new_env1)
-                val result = CONS (val1, val2)
-            in
-                (result, new_env2)
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "car"), CONS(sub_expr, ATOM NIL)), env) =
-            let
-                val (eval_res, new_env) = eval_aux (sub_expr, env)
-            in
-                (case eval_res of
-                    CONS (head, _) => (head, new_env)
-                  | _ => (ATOM (SYMBOL "lisp-error"), new_env))
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "cdr"), CONS (sub_expr, ATOM NIL)), env) =
-            let
-                val (eval_res, new_env) = eval_aux (sub_expr, env)
-            in
-                (case eval_res of
-                    CONS (_, tail) => (tail, new_env)
-                  | _ => (ATOM (SYMBOL "lisp-error"), new_env))
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "quote"), CONS (sub_expr, ATOM NIL)), env) = (sub_expr, env)
-          | eval_expr (CONS (ATOM (SYMBOL "atom"), CONS (sub_expr, ATOM NIL)), env) =
-            let
-                val (eval_res, new_env) = eval_aux (sub_expr, env)
-            in
-                (case eval_res of
-                    ATOM _ => (ATOM (SYMBOL "t"), new_env)
-                  | _ => (ATOM NIL, new_env))
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "null"), CONS (sub_expr, ATOM NIL)), env) =
-            let
-                val (eval_res, new_env) = eval_aux (sub_expr, env)
-            in
-                (case eval_res of
-                    ATOM NIL => (ATOM (SYMBOL "t"), new_env)
-                  | _ => (ATOM NIL, new_env))
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "eq"), CONS (expr1, CONS(expr2, ATOM NIL))), env) =
-            let
-                val (val1, new_env1) = eval_aux (expr1, env)
-                val (val2, new_env2) = eval_aux (expr2, new_env1)
-            in
-                if val1 = val2 andalso is_atom val1 andalso is_atom val2 then
-                    (ATOM (SYMBOL "t"), new_env2)
-                else
-                    (ATOM NIL, new_env2)
-            end
-          | eval_expr (CONS (ATOM (SYMBOL "cond"), conditions), env) =
-            let
-                fun eval_condition (CONS (condition, CONS (body, ATOM NIL)), env) =
-                    let
-                        val (cond_result, new_env) = eval_aux (condition, env)
-                    in
-                        (cond_result, body, new_env)
-                    end
-                  | eval_condition _ = raise LispError
+    fun eval_aux (expr, env) =
+        let
+            fun eval_expr (CONS (ATOM (SYMBOL "cons"), CONS (expr1, CONS (expr2, ATOM NIL))), env) = 
+                let
+                    val (val1, new_env1) = eval_aux (expr1, env)
+                    val (val2, new_env2) = eval_aux (expr2, new_env1)
+                    val result = CONS (val1, val2)
+                in
+                    (result, new_env2)
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "car"), CONS (sub_expr, ATOM NIL)), env) =
+                let
+                    val (eval_res, new_env) = eval_aux (sub_expr, env)
+                in
+                    (case eval_res of
+                        CONS (head, _) => (head, new_env)
+                    | _ => (ATOM (SYMBOL "lisp-error"), new_env))
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "cdr"), CONS (sub_expr, ATOM NIL)), env) =
+                let
+                    val (eval_res, new_env) = eval_aux (sub_expr, env)
+                in
+                    (case eval_res of
+                        CONS (_, tail) => (tail, new_env)
+                    | _ => (ATOM (SYMBOL "lisp-error"), new_env))
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "quote"), CONS (sub_expr, ATOM NIL)), env) = (sub_expr, env)
+            | eval_expr (CONS (ATOM (SYMBOL "atom"), CONS (sub_expr, ATOM NIL)), env) =
+                let
+                    val (eval_res, new_env) = eval_aux (sub_expr, env)
+                in
+                    (case eval_res of
+                        ATOM _ => (ATOM (SYMBOL "t"), new_env)
+                    | _ => (ATOM NIL, new_env))
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "null"), CONS (sub_expr, ATOM NIL)), env) =
+                let
+                    val (eval_res, new_env) = eval_aux (sub_expr, env)
+                in
+                    (case eval_res of
+                        ATOM NIL => (ATOM (SYMBOL "t"), new_env)
+                    | _ => (ATOM NIL, new_env))
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "eq"), CONS (expr1, CONS(expr2, ATOM NIL))), env) =
+                let
+                    val (val1, new_env1) = eval_aux (expr1, env)
+                    val (val2, new_env2) = eval_aux (expr2, new_env1)
+                in
+                    if val1 = val2 andalso is_atom val1 andalso is_atom val2 then
+                        (ATOM (SYMBOL "t"), new_env2)
+                    else
+                        (ATOM NIL, new_env2)
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "cond"), conditions), env) =
+                let
+                    fun eval_condition (CONS (condition, CONS (body, ATOM NIL)), env) =
+                        let
+                            val (cond_result, new_env) = eval_aux (condition, env)
+                        in
+                            (cond_result, body, new_env)
+                        end
+                    | eval_condition _ = raise LispError
 
-                fun eval_conditions (CONS (condition, rest), env) =
-                    let
-                        val (cond_result, body, new_env) = eval_condition (condition, env)
-                    in
-                        if cond_result <> ATOM NIL then
-                            eval_aux (body, new_env)
-                        else
-                            eval_conditions (rest, new_env)
-                    end
-                  | eval_conditions (ATOM NIL, env) = (ATOM NIL, env)
-            in
-                eval_conditions (conditions, env)
-            end
-        | eval_expr (CONS (ATOM (SYMBOL "+"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("+", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "-"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("-", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "*"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("*", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "/"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("/", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "mod"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("mod", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("=", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
-        | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
-          | eval_aux (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (exp, ATOM NIL))), values), env_stack) =
+                    fun eval_conditions (CONS (condition, rest), env) =
+                        let
+                            val (cond_result, body, new_env) = eval_condition (condition, env)
+                        in
+                            if cond_result <> ATOM NIL then
+                                eval_aux (body, new_env)
+                            else
+                                eval_conditions (rest, new_env)
+                        end
+                    | eval_conditions (ATOM NIL, env) = (ATOM NIL, env)
+                    | eval_conditions (_,_) = raise LispError
+                in
+                    eval_conditions (conditions, env)
+                end
+            | eval_expr (CONS (ATOM (SYMBOL "+"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("+", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "-"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("-", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "*"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("*", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "/"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("/", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "mod"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (math_lisp ("mod", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("=", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
+            | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
+            | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (body, ATOM NIL))), args), env_stack) =
             let
-                fun init_params ((CONS (ATOM (SYMBOL param), rest_params)), (CONS (value, rest_values)), env, env_stack) =
+                fun bind_params (CONS (ATOM (SYMBOL param), rest_params), CONS (value, rest_values), env, env_stack) =
                     let
-                        val eval_val = first (eval_aux (value, env_stack))
-                        val updated_env = define param env eval_val
+                        val bound_value = first (eval_aux (value, env_stack))
+                        val updated_env = define param env bound_value
                     in
-                        init_params (rest_params, rest_values, updated_env, env_stack)
+                        bind_params (rest_params, rest_values, updated_env, env_stack)
                     end
-                    | init_params ((ATOM NIL), (ATOM NIL), env, env_stack) = env
-                    | init_params (_, _, _, _) = raise LispError
+                    | bind_params (ATOM NIL, ATOM NIL, env, env_stack) = env
+                    | bind_params _ = raise LispError
 
-                val env_init = initEnv()
-                val env = init_params (params, values, env_init, env_stack)
-                val updated_env_stack = pushEnv env env_stack
-                val sexp = sexp_to_string exp
-                val evaluated_exp = first (eval_aux (exp, updated_env_stack))
+                val initial_env = initEnv ()
+                val local_env = bind_params (params, args, initial_env, env_stack)
+                val full_env_stack = pushEnv local_env env_stack
             in
-                (evaluated_exp, env_stack)
+                (first (eval_aux (body, full_env_stack)), env_stack)
             end
-          | eval_expr (CONS (ATOM (SYMBOL sym), ATOM NIL), env) = eval_expr (ATOM (SYMBOL sym), env)
-          | eval_expr (ATOM (SYMBOL sym), env) =
-            (case sym of
-                s => if is_number s orelse s = "nil" then (ATOM (SYMBOL s), env)
-                     else (find s env, env) handle Undefined => (ATOM (SYMBOL "lisp-error"), env))
-          | eval_expr _ = (ATOM (SYMBOL "lisp-error"), env)
-    in
-        eval_expr (expr, env)
-    end;
+            | eval_expr (CONS (ATOM (SYMBOL sym), ATOM NIL), env) = eval_expr (ATOM (SYMBOL sym), env)
+            | eval_expr (ATOM (SYMBOL sym), env) =
+                (case sym of
+                    "nil" => (ATOM NIL, env)
+                | "t" => (ATOM (SYMBOL "t"), env)
+                | s => if is_number s then (ATOM (SYMBOL s), env)
+                        else (find s env, env) handle Undefined => (ATOM (SYMBOL "lisp-error"), env))
+            | eval_expr _ = (ATOM (SYMBOL "lisp-error"), env)
+        in
+            eval_expr (expr, env)
+        end;
+
 
     (* ====================================== *)
 
 in
-    fun eval string_exp env =
+    fun eval "()" env = (ATOM NIL, env)
+    | eval string_exp env =
         let
             val sexp = parse (tokenize string_exp)
         in

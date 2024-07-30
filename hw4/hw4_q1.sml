@@ -11,7 +11,9 @@ fun initEnv () = fn
     (x: string) => (raise Undefined):SExp;
 
 
-fun define x y z = fn (a: string) => if x = a then z else y x;
+fun define x env z = fn (a: string) =>
+    if x = a then z else env a;
+
 
 fun emptyNestedEnv () = [] : (string -> SExp) list;
 
@@ -30,6 +32,9 @@ fun defineNested (s: string) ([]: (string -> 'a) list) (z: 'a) = raise Empty   |
         pushEnv newTop rest
     end;
 
-fun find (msg: string) ([]: (string -> 'a) list) = raise Undefined
-  | find (msg: string) (env::rest) =
-    (env msg) handle Undefined => find msg rest;
+fun find (msg: string) (envs: (string -> SExp) list) =
+    case envs of
+        [] => raise Undefined
+      | env::rest => (case env msg of
+                        value => value
+                      handle Undefined => find msg rest);
