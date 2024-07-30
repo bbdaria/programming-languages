@@ -201,7 +201,7 @@ local
             | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
             | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
             | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
-            | eval_aux (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (exp, ATOM NIL))), values), env_stack) =
+            | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (exp, ATOM NIL))), values), env_stack) =
             let
                 fun init_params ((CONS (ATOM (SYMBOL param), rest_params)), (CONS (value, rest_values)), env, env_stack) =
                     let
