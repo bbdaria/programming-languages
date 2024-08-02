@@ -1,26 +1,28 @@
+from typing import List, Set, Union
+
 class Student:
-    def __init__(self, name, age, grades):
+    def __init__(self, name: str, age: int, grades: List[int]):
         self.name = name
         self.age = age
         self.grades = grades
 
-    def average_grade(self):
+    def average_grade(self) -> float:
         return sum(self.grades) / len(self.grades)
 
-def find_top_student(students):
+def find_top_student(students: List[Student]) -> Student:
     top_student = students[0]
     for student in students:
         if student.average_grade() > top_student.average_grade():
             top_student = student
     return top_student
 
-def factorial(n):
+def factorial(n: int) -> int:
     if n == 0:
         return 1
     else:
         return n * factorial(n-1)
 
-def fibonacci(n):
+def fibonacci(n: int) -> List[int]:
     if n <= 0:
         return []
     elif n == 1:
@@ -32,12 +34,12 @@ def fibonacci(n):
         fibs.append(fibs[-1] + fibs[-2])
         return fibs
 
-def add_grades_to_set(s, grades):
+def add_grades_to_set(s: Set[int], grades: List[int]) -> Set[int]:
     for grade in grades:
         s.add(grade)
     return s
 
-def calculate_total_length(strings):
+def calculate_total_length(strings: List[str]) -> int:
     total = 0
     for s in strings:
         total += len(s)
