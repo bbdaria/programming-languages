@@ -5,8 +5,6 @@ exception LispError;
 Control.Print.printLength := 100;
 Control.Print.printDepth := 100;
 
-
-(* Helper function - feel free to delete *)
 fun first (x, _) = x;
 fun tokenize x = 
         String.tokens (fn c: char => c = #" ") 
@@ -30,12 +28,7 @@ and print_cons (car, ATOM NIL) = sexp_to_string car
 
 
 local
-    (*fun tokenize x = 
-        String.tokens (fn c: char => c = #" ") 
-            (String.translate (fn #"(" => "( " | #")" => " )" | c => str c) x);*)
 
-    (* Helper functions - feel free to delete *)
-    (* ====================================== *)
     fun is_digit c = c >= #"0" andalso c <= #"9";
 
     fun is_number str =
@@ -142,8 +135,8 @@ local
                     | _ => (ATOM (SYMBOL "lisp-error"), new_env))
                 end
             | eval_expr (CONS (ATOM (SYMBOL "quote"), CONS (sub_expr, ATOM NIL)), env) = (sub_expr, env)
-            | eval_expr (CONS (ATOM (SYMBOL "atom"), CONS (sub_expr, ATOM NIL)), env) =
-                let
+           | eval_expr (CONS (ATOM (SYMBOL "atom"), CONS (sub_expr, ATOM NIL)), env) =
+                let 
                     val (eval_res, new_env) = eval_aux (sub_expr, env)
                 in
                     (case eval_res of
@@ -201,25 +194,23 @@ local
             | eval_expr (CONS (ATOM (SYMBOL "/="), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("/=", arg1, arg2, env), env)
             | eval_expr (CONS (ATOM (SYMBOL "<"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp ("<", arg1, arg2, env), env)
             | eval_expr (CONS (ATOM (SYMBOL ">"), CONS(ATOM (SYMBOL arg1), CONS(ATOM (SYMBOL arg2), ATOM NIL))), env) = (comp_lisp (">", arg1, arg2, env), env)
-            | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (exp, ATOM NIL))), values), env_stack) =
+            | eval_expr (CONS (CONS (ATOM (SYMBOL "lambda"), CONS (params, CONS (body, ATOM NIL))), args), env_stack) =
             let
-                fun init_params ((CONS (ATOM (SYMBOL param), rest_params)), (CONS (value, rest_values)), env, env_stack) =
+                fun bind_params (CONS (ATOM (SYMBOL param), rest_params), CONS (value, rest_values), env, env_stack) =
                     let
-                        val eval_val = first (eval_expr (value, env_stack))
-                        val updated_env = define param env eval_val
+                        val bound_value = first (eval_aux (value, env_stack))
+                        val updated_env = define param env bound_value
                     in
-                        init_params (rest_params, rest_values, updated_env, env_stack)
+                        bind_params (rest_params, rest_values, updated_env, env_stack)
                     end
-                    | init_params ((ATOM NIL), (ATOM NIL), env, env_stack) = env
-                    | init_params (_, _, _, _) = raise LispError
+                    | bind_params (ATOM NIL, ATOM NIL, env, env_stack) = env
+                    | bind_params _ = raise LispError
 
-                val env_init = initEnv()
-                val env = init_params (params, values, env_init, env_stack)
-                val updated_env_stack = pushEnv env env_stack
-                val sexp = sexp_to_string exp
-                val evaluated_exp = first (eval_expr (exp, updated_env_stack))
+                val initial_env = initEnv ()
+                val local_env = bind_params (params, args, initial_env, env_stack)
+                val full_env_stack = pushEnv local_env env_stack
             in
-                (evaluated_exp, env_stack)
+                (first (eval_aux (body, full_env_stack)), env_stack)
             end
             | eval_expr (CONS (ATOM (SYMBOL sym), ATOM NIL), env) = eval_expr (ATOM (SYMBOL sym), env)
             | eval_expr (ATOM (SYMBOL sym), env) =
@@ -234,7 +225,6 @@ local
         end;
 
 
-    (* ====================================== *)
 
 in
     fun eval "()" env = (ATOM NIL, env)
