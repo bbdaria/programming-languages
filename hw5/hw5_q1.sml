@@ -30,11 +30,30 @@ fun Q () =
     next (1, 1)
   end;
 
-fun diags DNil = Nil
-  | diags (DCons ((x, y), nextX, nextY)) =
-      let
-        fun traverse_diag (1, y) = Cons ((1, y), fn () => diags (nextY ()))
-          | traverse_diag (x, y) = Cons ((x, y), fn () => traverse_diag (x-1, y+1))
-      in
-        traverse_diag (x, y)
-      end;
+
+fun merge [] ys = ys
+  | merge xs [] = xs
+  | merge (x::xs) (y::ys) = x :: y :: merge xs ys;
+
+
+local
+    fun traverse [] [] = Nil
+    | traverse [] next_diag = traverse next_diag []
+    | traverse (dseq :: ns) [] =
+        let
+        in
+        case dseq () of
+            DCons (head, xf, yf) => Cons (head, fn () => traverse ns [yf, xf])
+            | DNil => traverse ns []
+        end
+    | traverse (dseq :: ns) next_diag =
+        let
+        in
+        case dseq () of
+            DCons (head, xf, yf) => Cons (head, fn () => traverse ns (next_diag @ [xf]))
+            | DNil => traverse ns next_diag
+        end
+in
+    fun diags DNil = Nil
+      | diags dseq = traverse [fn () => dseq] []
+end;
